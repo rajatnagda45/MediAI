@@ -1,6 +1,6 @@
 # My App
 
-This project is a React-based web application designed for patient registration and medical analysis. It features a multi-step form for collecting patient data, integration with an AI-based analysis service, and a responsive design.
+This project is a React-based web application designed for patient registration and medical analysis. It features a multi-step form for collecting patient data, integration with an AI-based analysis service, and a responsive design .
 
 ![Project Screenshot](public/project5.png)
 
