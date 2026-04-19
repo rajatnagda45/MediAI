@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { generateGroqResponse } from '../utils/groqService';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const PatientAnalysis = ({ formData }) => {
@@ -262,16 +262,11 @@ const PatientAnalysis = ({ formData }) => {
         "Based on this analysis, I recommend the [DEPARTMENT NAME] department."
         `;
 
-        // Get department recommendation from Ollama with deepseek-r1:8b model
-        const departmentResponse = await axios.post('http://localhost:11434/api/generate', {
-          model: 'deepseek-r1:8b', // Changed model to deepseek-r1:8b
-          prompt: departmentPrompt,
-          stream: false
-        });
+        // Get department recommendation from Groq
+        const deptResponse = await generateGroqResponse(departmentPrompt);
 
         // Extract just the department name from the response
         recommendedDepartment = "General Medicine"; // Default
-        const deptResponse = departmentResponse.data.response;
         
         // Look for the recommendation format in the response
         const deptMatch = deptResponse.match(/recommend the\s+(\w+(?:\s+\&\s+\w+|\s+\w+)*)\s+department/i) || 
@@ -339,11 +334,8 @@ const PatientAnalysis = ({ formData }) => {
         Keep your response focused, professional, and appropriate for a medical report.
       `;
       
-      const analysisResponse = await axios.post('http://localhost:11434/api/generate', {
-        model: 'deepseek-r1:8b', // Changed model to deepseek-r1:8b
-        prompt: analysisPrompt,
-        stream: false
-      });
+      const analysisText = await generateGroqResponse(analysisPrompt);
+      const analysisResponse = { data: { response: analysisText } };
 
       // Extract symptom tags for display
       const symptomTags = formData.symptoms ? 
@@ -612,7 +604,7 @@ const PatientAnalysis = ({ formData }) => {
       analysisWindow.document.close();
     } catch (error) {
       console.error('Analysis error:', error);
-      setError(`Analysis failed. Error: ${error.message}. Please ensure Ollama is running with the deepseek-r1:8b model.`);
+      setError(`Analysis failed. Error: ${error.message}. Please ensure Groq API key is configured correctly.`);
     } finally {
       setIsLoading(false);
     }
